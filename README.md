@@ -73,7 +73,6 @@ nstrumenta will save your configuration scoped to the current user. Within this 
 - [machines](#machines)
 - [subscribe](#subscribe)
 - [send](#send)
-- [serve](#serve) _...deprecated??_
 - [module](#module)
 - [agent](#module) _need doc_
 
@@ -194,31 +193,21 @@ examples:
 ```shell
 # publishes all modules listed in .nstrumenta/config.json
 nst module publish
-
-# publish a single named module, listed in .nstrumenta/config.json
-nst module publish gpio-rpi
 ```
 
 Modules are referenced in `.nstrumenta/config.json`
 
 ```json
 {
+  
   "modules": [
     {
       "name": "gpio-rpi",
       "folder": "./gpio-rpi",
-      "config": "module.json",
     },
     {
       // ...
     }
-  ],
-  "stacks": [
-    // all modules running in the stack
-    // channel mappings (graph definition)
-  ]
-
-  // ...
 }
 ```
 
@@ -228,15 +217,14 @@ The modules are configured within their respective folders in the `config` file,
 {
     "type": "nodejs",
     "name": "gpio-rpi",
-    "run": "npm run start",
+    "entry": "npm run start",
     "version": "0.0.13",
     "excludes": ["node_modules/"], // optional
-    "channels": [{"channel": "gpio-in", "type": "subscribe"},]
 }
 ```
 
 `type` can be *nodejs*, *sandbox* (for web app sandboxes), or *algorithm*
-`run` is the command to run when an agent loads a module
+`exec` is the command to run when an agent loads a module
 `version` is a unique semver string; publishing with an existing version will fail
 `excludes` defaults to `["node_modules"]`; is a list of patterns to exclude from the module folder when publishing. Publishing with node modules is unnecessary and will consume excessive space. 
 
@@ -244,7 +232,7 @@ The modules are configured within their respective folders in the `config` file,
 
 `publish {MODULE_NAME}`
 
-Publish modules. If no MODULE_NAME is given, all the modules lsited in project config (`.nstrumenta/config.json`) will be published
+Publish modules referenced in `.nstrumenta/config.json` and defined in the respective `module.json` for each
 
 ***
 
@@ -267,7 +255,7 @@ const { NstrumentaClient } = require('nstrumenta/dist/module/client');
 const nst = new NstrumentaClient({ hostUrl: "ws://localhost:8088" });
 
 nst.addListener('open', () => {
-  nst.subscribe('CHANNEL', (event) => {
+  nst.addSubscription('CHANNEL', (event) => {
     console.log(event);
   });
 });
@@ -276,3 +264,7 @@ nst.addListener('open', () => {
 ```console
 $ node index.js
 ```
+
+# Examples
+
+[nodejs](./examples/module-nodejs-minimal)

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nstrumenta/nstrumenta/main/module.schema.json",
+  "type": "nodejs",
+  "entry": "npm run start",
+  "version": "0.0.1",
+  "exclude": ["node_modules/"]
+}

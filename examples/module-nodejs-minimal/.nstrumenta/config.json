@@ -1,0 +1,8 @@
+{
+  "modules": [
+    {
+      "name": "minimal-nodejs",
+      "folder": "./"
+    }
+  ]
+}
