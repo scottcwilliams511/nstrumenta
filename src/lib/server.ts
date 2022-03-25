@@ -54,6 +54,7 @@ export interface NstrumentaServerOptions {
   debug?: boolean;
   noBackplane?: boolean;
   allowCrossProjectApiKey?: boolean;
+  nstDir?: string;
 }
 
 export class NstrumentaServer {
@@ -92,13 +93,14 @@ export class NstrumentaServer {
   public async run() {
     const { apiKey, debug } = this.options;
     const port = this.options.port || DEFAULT_HOST_PORT;
+    const nstDir = this.options.nstDir ? this.options.nstDir : await getNstDir();
 
     // server makes a local .nst folder at the cwd
     // this allows multiple servers and working directories on the same machine
     const cwdNstDir = `${process.cwd()}/.nst`;
     await fs.mkdir(cwdNstDir, { recursive: true });
 
-    console.log(`nstrumenta working directory: ${await getNstDir()}`);
+    console.log(`nstrumenta working directory: ${nstDir}`);
 
     if (this.backplaneClient) {
       try {
@@ -124,7 +126,6 @@ export class NstrumentaServer {
                   const {
                     data: { module: moduleName, args },
                   } = message;
-                  const nstDir = await getNstDir();
                   const logPath = `${nstDir}/${moduleName}-${actionId}.txt`;
                   console.log(`starting logging ${logPath}`);
                   const stream = createWriteStream(logPath);
@@ -222,7 +223,7 @@ export class NstrumentaServer {
     app.use('/logs', express.static('logs'), serveIndex('logs', { icons: false }));
 
     //serves public subfolder from execution path for serving sandboxes
-    const sandboxPath = `${await getNstDir()}/modules`;
+    const sandboxPath = `${nstDir}/modules`;
     app.use('/modules', express.static(sandboxPath), serveIndex(sandboxPath, { icons: false }));
 
     app.get('/', function (req, res) {
